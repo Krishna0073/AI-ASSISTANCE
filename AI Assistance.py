@@ -1,64 +1,149 @@
-from tkinter import *
+import customtkinter as ctk
+from tkinter import END
 import datetime
 import webbrowser
-import random
 
-def reply():
-    user_input = entry.get().lower()
-    chat.insert(END, "You: " + user_input + "\n")
+# ------------------ SETTINGS ------------------
 
-    if "hello" in user_input or "hi" in user_input:
-        chat.insert(END, "AI: Hello! How can I help you?\n")
+ctk.set_appearance_mode("Dark")
+ctk.set_default_color_theme("blue")
 
-    elif "time" in user_input:
-        import datetime
-        t = datetime.datetime.now().strftime("%H:%M:%S")
-        chat.insert(END, "AI: Current time is " + t + "\n")
+# ------------------ WINDOW ------------------
 
-    elif "date" in user_input:
-        import datetime
-        d = datetime.date.today()
-        chat.insert(END, "AI: Today's date is " + str(d) + "\n")
+root = ctk.CTk()
 
-    elif "youtube" in user_input:
-        import webbrowser
-        chat.insert(END, "AI: Opening YouTube...\n")
+root.geometry("1000x650")
+root.title("AI Assistant")
+
+# ------------------ FUNCTIONS ------------------
+
+def save_history():
+
+    data = chatbox.get("1.0", END)
+
+    with open("history.txt","w",encoding="utf-8") as file:
+        file.write(data)
+
+
+def clear_chat():
+
+    chatbox.delete("1.0",END)
+
+
+def send():
+
+    user = entry.get()
+
+    if user=="":
+
+        return
+
+    chatbox.insert(END,"You : "+user+"\n\n")
+
+    text=user.lower()
+
+    if "hello" in text or "hi" in text:
+
+        bot="Hello Krishna! 👋"
+
+    elif "time" in text:
+
+        bot=datetime.datetime.now().strftime("%H:%M:%S")
+
+    elif "date" in text:
+
+        bot=str(datetime.date.today())
+
+    elif "youtube" in text:
+
         webbrowser.open("https://youtube.com")
 
-    elif "google" in user_input:
-        import webbrowser
-        chat.insert(END, "AI: Opening Google...\n")
+        bot="Opening YouTube..."
+
+    elif "google" in text:
+
         webbrowser.open("https://google.com")
-    elif "joke" in user_input:
-        jokes = [
-            "Why don't scientists trust atoms? Because they make up everything!",
-            "Why did the scarecrow win an award? Because he was outstanding in his field!",
-            "Why don't skeletons fight each other? They don't have the guts!"
-        ]
-        chat.insert(END, "AI: Here's a joke for you: " + random.choice(jokes) + "\n")
-    elif "How are you?" in user_input:
-        chat.insert(END, "AI: I'm just a program, but I'm doing great! Thanks for asking.\n")
+
+        bot="Opening Google..."
+
     else:
-        chat.insert(END, "AI: I didn't understand.\n")
 
-    entry.delete(0, END)
+        bot="Sorry, I don't understand."
 
-# GUI
-root = Tk()
-root.title("AI Assistant")
-root.geometry("550x650")
-root.config(bg="#6f8faf")
+    chatbox.insert(END,"AI : "+bot+"\n\n")
 
-frame = LabelFrame(root, text="AI Assistant", padx=10, pady=10)
-frame.pack(padx=10, pady=10)
+    entry.delete(0,END)
 
-chat = Text(frame, width=60, height=25)
-chat.pack()
+    chatbox.see(END)
 
-entry = Entry(root, width=40)
-entry.pack(pady=10)
+# ------------------ SIDEBAR ------------------
 
-send = Button(root, text="Send", command=reply)
-send.pack()
+sidebar=ctk.CTkFrame(root,width=200)
+
+sidebar.pack(side="left",fill="y")
+
+title=ctk.CTkLabel(
+sidebar,
+text="AI Assistant",
+font=("Arial",24,"bold")
+)
+
+title.pack(pady=30)
+
+saveButton=ctk.CTkButton(
+sidebar,
+text="Save Chat",
+command=save_history
+)
+
+saveButton.pack(pady=15)
+
+clearButton=ctk.CTkButton(
+sidebar,
+text="Clear Chat",
+command=clear_chat
+)
+
+clearButton.pack(pady=15)
+
+# ------------------ MAIN FRAME ------------------
+
+main=ctk.CTkFrame(root)
+
+main.pack(fill="both",expand=True,padx=10,pady=10)
+
+chatbox=ctk.CTkTextbox(
+main,
+width=700,
+height=500,
+font=("Consolas",15)
+)
+
+chatbox.pack(pady=15,padx=10)
+
+entry=ctk.CTkEntry(
+main,
+placeholder_text="Type your message...",
+height=40,
+font=("Arial",16)
+)
+
+entry.pack(fill="x",padx=10,pady=10)
+
+entry.bind("<Return>",lambda event:send())
+
+sendButton=ctk.CTkButton(
+main,
+text="Send",
+height=40,
+command=send
+)
+
+sendButton.pack(pady=10)
+
+chatbox.insert(
+END,
+"AI : Hello! I am your AI Assistant.\n\n"
+)
 
 root.mainloop()
