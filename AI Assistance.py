@@ -1,9 +1,12 @@
 from random import random
+
 import customtkinter as ctk
 from tkinter import END
 import datetime
 import webbrowser
 import string
+
+
 # ------------------ SETTINGS ------------------
 
 ctk.set_appearance_mode("Dark")
@@ -142,9 +145,9 @@ def send():
             bot = "Invalid Expression."
 
     # Google Search
-    elif text.startswith("search"):
+    elif text.startswith("what is "):
 
-        query = text.replace("search", "")
+        query = text.replace("what is ", "")
 
         webbrowser.open(
             "https://www.google.com/search?q=" + query
