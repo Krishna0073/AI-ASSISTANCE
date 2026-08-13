@@ -1,267 +1,562 @@
-from random import random
-
 import customtkinter as ctk
 from tkinter import END
 import datetime
 import webbrowser
+import random
 import string
 
 
-# ------------------ SETTINGS ------------------
+# ============================================================
+# SETTINGS
+# ============================================================
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
-# ------------------ WINDOW ------------------
+
+# ============================================================
+# DATA
+# ============================================================
+
+JOKES = [
+    "Why don't scientists trust atoms? Because they make up everything!",
+    "Why don't skeletons fight each other? They don't have the guts!",
+    "Programming is 10% coding and 90% debugging.",
+    "Why was the computer cold? It forgot to close its Windows!",
+    "Why do programmers prefer dark mode? Because light attracts bugs!"
+]
+
+QUOTES = [
+    "Believe in yourself.",
+    "Success comes from consistency.",
+    "Never stop learning.",
+    "Every expert was once a beginner.",
+    "Dream big and work hard."
+]
+
+UNKNOWN_RESPONSES = [
+    "Sorry, I didn't understand.",
+    "Please try another command.",
+    "Type 'help' to see available commands.",
+    "I'm still learning that."
+]
+
+
+# ============================================================
+# WINDOW
+# ============================================================
 
 root = ctk.CTk()
 
-root.geometry("1000x650")
 root.title("AI Assistant")
+root.geometry("1000x650")
+root.minsize(850, 550)
 
-# ------------------ FUNCTIONS ------------------
+
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+
+def add_message(sender, message):
+    """
+    Display a message in the chatbox.
+    """
+
+    chatbox.insert(
+        END,
+        f"{sender} : {message}\n\n"
+    )
+
+    chatbox.see(END)
+
 
 def save_history():
+    """
+    Save the current conversation to history.txt.
+    """
 
     data = chatbox.get("1.0", END)
 
-    with open("history.txt","w",encoding="utf-8") as file:
+    with open(
+        "history.txt",
+        "w",
+        encoding="utf-8"
+    ) as file:
+
         file.write(data)
+
+    add_message(
+        "AI",
+        "Chat history saved successfully."
+    )
 
 
 def clear_chat():
+    """
+    Clear all messages from the chatbox.
+    """
 
-    chatbox.delete("1.0",END)
+    chatbox.delete("1.0", END)
 
+    add_message(
+        "AI",
+        "Chat cleared. How can I help you?"
+    )
+
+
+# ============================================================
+# MAIN SEND FUNCTION
+# ============================================================
 
 def send():
 
-    user = entry.get()
+    user = entry.get().strip()
 
-    if user == "":
+    # Don't send empty messages
+    if not user:
         return
 
-    chatbox.insert(END, "You : " + user + "\n\n")
+    # Display user's message
+    add_message("You", user)
 
+    # Convert to lowercase for command checking
     text = user.lower()
 
-    # Greeting
+    # --------------------------------------------------------
+    # GREETING
+    # --------------------------------------------------------
+
     if "hello" in text or "hi" in text:
 
         bot = "Hello Krishna! 👋"
 
-    # Time
+
+    # --------------------------------------------------------
+    # TIME
+    # --------------------------------------------------------
+
     elif "time" in text:
 
-        bot = datetime.datetime.now().strftime("%H:%M:%S")
+        bot = datetime.datetime.now().strftime(
+            "%H:%M:%S"
+        )
 
-    # Date
+
+    # --------------------------------------------------------
+    # DATE
+    # --------------------------------------------------------
+
     elif "date" in text:
 
-        bot = str(datetime.date.today())
+        bot = str(
+            datetime.date.today()
+        )
 
-    # Open YouTube
+
+    # --------------------------------------------------------
+    # YOUTUBE
+    # --------------------------------------------------------
+
     elif "youtube" in text:
 
-        webbrowser.open("https://youtube.com")
+        webbrowser.open(
+            "https://youtube.com"
+        )
+
         bot = "Opening YouTube..."
 
-    # Open Google
+
+    # --------------------------------------------------------
+    # GOOGLE
+    # --------------------------------------------------------
+
     elif "google" in text:
 
-        webbrowser.open("https://google.com")
+        webbrowser.open(
+            "https://google.com"
+        )
+
         bot = "Opening Google..."
 
-    # Open GitHub
+
+    # --------------------------------------------------------
+    # GITHUB
+    # --------------------------------------------------------
+
     elif "github" in text:
 
-        webbrowser.open("https://github.com")
+        webbrowser.open(
+            "https://github.com"
+        )
+
         bot = "Opening GitHub..."
 
-    # Open LinkedIn
+
+    # --------------------------------------------------------
+    # LINKEDIN
+    # --------------------------------------------------------
+
     elif "linkedin" in text:
 
-        webbrowser.open("https://linkedin.com")
+        webbrowser.open(
+            "https://linkedin.com"
+        )
+
         bot = "Opening LinkedIn..."
 
-    # Open Gmail
+
+    # --------------------------------------------------------
+    # GMAIL
+    # --------------------------------------------------------
+
     elif "gmail" in text:
 
-        webbrowser.open("https://gmail.com")
+        webbrowser.open(
+            "https://gmail.com"
+        )
+
         bot = "Opening Gmail..."
 
-    # Joke
+
+    # --------------------------------------------------------
+    # JOKE
+    # --------------------------------------------------------
+
     elif "joke" in text:
 
-        jokes = [
-            "Why don't scientists trust atoms? Because they make up everything!",
-            "Why don't skeletons fight each other? They don't have the guts!",
-            "Programming is 10% coding and 90% debugging.",
-            "Why was the computer cold? It forgot to close its Windows!"
-        ]
+        bot = random.choice(JOKES)
 
-        bot = random.choice(jokes)
 
-    # Motivation
+    # --------------------------------------------------------
+    # MOTIVATION
+    # --------------------------------------------------------
+
     elif "motivate" in text or "quote" in text:
 
-        quotes = [
-            "Believe in yourself.",
-            "Success comes from consistency.",
-            "Never stop learning.",
-            "Every expert was once a beginner.",
-            "Dream big and work hard."
-        ]
+        bot = random.choice(QUOTES)
 
-        bot = random.choice(quotes)
 
-    # Password Generator
+    # --------------------------------------------------------
+    # PASSWORD
+    # --------------------------------------------------------
+
     elif "password" in text:
 
-        import string
-
-        characters = string.ascii_letters + string.digits + "@#$%"
+        characters = (
+            string.ascii_letters
+            + string.digits
+            + "@#$%"
+        )
 
         password = ""
 
-        for i in range(12):
-            password += random.choice(characters)
+        for _ in range(12):
 
-        bot = "Generated Password : " + password
+            password += random.choice(
+                characters
+            )
 
-    # Calculator
+        bot = (
+            "Generated Password : "
+            + password
+        )
+
+
+    # --------------------------------------------------------
+    # CALCULATOR
+    # --------------------------------------------------------
+
     elif text.startswith("calculate"):
 
         try:
 
-            expression = text.replace("calculate", "")
+            expression = text.replace(
+                "calculate",
+                "",
+                1
+            ).strip()
 
-            answer = eval(expression)
+            if not expression:
 
-            bot = "Answer = " + str(answer)
+                bot = "Please provide a calculation."
 
-        except:
+            else:
 
-            bot = "Invalid Expression."
+                answer = eval(expression)
 
-    # Google Search
-    elif text.startswith("what is "):
+                bot = (
+                    "Answer = "
+                    + str(answer)
+                )
 
-        query = text.replace("what is ", "")
+        except Exception:
 
-        webbrowser.open(
-            "https://www.google.com/search?q=" + query
-        )
+            bot = "Invalid calculation."
 
-        bot = "Searching Google..."
 
-    # Help
+    # --------------------------------------------------------
+    # GOOGLE SEARCH
+    # --------------------------------------------------------
+
+    elif text.startswith("search"):
+
+        query = text.replace(
+            "search",
+            "",
+            1
+        ).strip()
+
+        if query:
+
+            webbrowser.open(
+                "https://www.google.com/search?q="
+                + query
+            )
+
+            bot = (
+                "Searching Google for: "
+                + query
+            )
+
+        else:
+
+            bot = "What would you like me to search for?"
+
+
+    # --------------------------------------------------------
+    # WHAT IS
+    # --------------------------------------------------------
+
+    elif text.startswith("what is"):
+
+        query = text.replace(
+            "what is",
+            "",
+            1
+        ).strip()
+
+        if query:
+
+            webbrowser.open(
+                "https://www.google.com/search?q="
+                + query
+            )
+
+            bot = (
+                "Searching Google for: "
+                + query
+            )
+
+        else:
+
+            bot = "Please tell me what you want to know."
+
+
+    # --------------------------------------------------------
+    # HELP
+    # --------------------------------------------------------
+
     elif "help" in text:
 
         bot = """
-Available Commands
+Available Commands:
 
 hello
 time
 date
+
 youtube
 google
 github
 linkedin
 gmail
+
 joke
 motivate
+quote
 password
-calculate 5*10
-search python tkinter
+
+calculate 25*4
+search Python
+what is artificial intelligence
+
 help
 """
 
-    # Unknown command
+
+    # --------------------------------------------------------
+    # UNKNOWN COMMAND
+    # --------------------------------------------------------
+
     else:
 
-        replies = [
-            "Sorry, I didn't understand.",
-            "Please try another command.",
-            "Type 'help' to see available commands.",
-            "I don't know that command yet."
-        ]
+        bot = random.choice(
+            UNKNOWN_RESPONSES
+        )
 
-        bot = random.choice(replies)
 
-    chatbox.insert(END, "AI : " + bot + "\n\n")
+    # --------------------------------------------------------
+    # DISPLAY AI RESPONSE
+    # --------------------------------------------------------
 
-    entry.delete(0, END)
+    add_message(
+        "AI",
+        bot
+    )
 
-    chatbox.see(END)
-# ------------------ SIDEBAR ------------------
+    # Clear input box
+    entry.delete(
+        0,
+        END
+    )
 
-sidebar=ctk.CTkFrame(root,width=200)
 
-sidebar.pack(side="left",fill="y")
+# ============================================================
+# SIDEBAR
+# ============================================================
 
-title=ctk.CTkLabel(
-sidebar,
-text="AI Assistant",
-font=("Arial",24,"bold")
+sidebar = ctk.CTkFrame(
+    root,
+    width=200
 )
 
-title.pack(pady=30)
-
-saveButton=ctk.CTkButton(
-sidebar,
-text="Save Chat",
-command=save_history
+sidebar.pack(
+    side="left",
+    fill="y"
 )
 
-saveButton.pack(pady=15)
 
-clearButton=ctk.CTkButton(
-sidebar,
-text="Clear Chat",
-command=clear_chat
+title = ctk.CTkLabel(
+    sidebar,
+    text="AI Assistant",
+    font=("Arial", 24, "bold")
 )
 
-clearButton.pack(pady=15)
-
-# ------------------ MAIN FRAME ------------------
-
-main=ctk.CTkFrame(root)
-
-main.pack(fill="both",expand=True,padx=10,pady=10)
-
-chatbox=ctk.CTkTextbox(
-main,
-width=700,
-height=500,
-font=("Consolas",15)
+title.pack(
+    pady=30
 )
 
-chatbox.pack(pady=15,padx=10)
 
-entry=ctk.CTkEntry(
-main,
-placeholder_text="Type your message...",
-height=40,
-font=("Arial",16)
+save_button = ctk.CTkButton(
+    sidebar,
+    text="💾 Save Chat",
+    command=save_history
 )
 
-entry.pack(fill="x",padx=10,pady=10)
-
-entry.bind("<Return>",lambda event:send())
-
-sendButton=ctk.CTkButton(
-main,
-text="Send",
-height=40,
-command=send
+save_button.pack(
+    pady=15,
+    padx=15
 )
 
-sendButton.pack(pady=10)
 
-chatbox.insert(
-END,
-"AI : Hello! I am your AI Assistant.\n\n"
+clear_button = ctk.CTkButton(
+    sidebar,
+    text="🗑 Clear Chat",
+    command=clear_chat
 )
+
+clear_button.pack(
+    pady=15,
+    padx=15
+)
+
+
+# ============================================================
+# MAIN FRAME
+# ============================================================
+
+main = ctk.CTkFrame(
+    root
+)
+
+main.pack(
+    fill="both",
+    expand=True,
+    padx=10,
+    pady=10
+)
+
+
+# ============================================================
+# CHATBOX
+# ============================================================
+
+chatbox = ctk.CTkTextbox(
+    main,
+    font=("Consolas", 15)
+)
+
+chatbox.pack(
+    fill="both",
+    expand=True,
+    padx=10,
+    pady=10
+)
+
+
+# ============================================================
+# INPUT AREA
+# ============================================================
+
+bottom = ctk.CTkFrame(
+    main
+)
+
+bottom.pack(
+    fill="x",
+    padx=10,
+    pady=10
+)
+
+
+entry = ctk.CTkEntry(
+    bottom,
+    placeholder_text="Type your message...",
+    height=40,
+    font=("Arial", 16)
+)
+
+entry.pack(
+    side="left",
+    fill="x",
+    expand=True,
+    padx=5
+)
+
+
+# Press Enter to send
+entry.bind(
+    "<Return>",
+    lambda event: send()
+)
+
+
+send_button = ctk.CTkButton(
+    bottom,
+    text="Send",
+    width=80,
+    height=40,
+    command=send
+)
+
+send_button.pack(
+    side="right",
+    padx=5
+)
+
+
+# ============================================================
+# WELCOME MESSAGE
+# ============================================================
+
+add_message(
+    "AI",
+    "Hello Krishna! 👋 I am your AI Assistant."
+)
+
+
+# ============================================================
+# START APPLICATION
+# ============================================================
 
 root.mainloop()
